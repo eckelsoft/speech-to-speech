@@ -3,32 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Speech Recognition & TTS</title>
+    <title>Advanced Speech-to-Text</title>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #f4f4f4; }
-        .container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-top: 2rem; width: 80%; max-width: 600px; }
-        h1, h2 { color: #333; }
-        button { background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin: 5px; }
-        button:hover { background-color: #0056b3; }
-        #gesprochenerText { margin-top: 1rem; padding: 1rem; border: 1px solid #ddd; min-height: 50px; border-radius: 5px; }
-        #ttsQueue { list-style-type: none; padding: 0; }
-        #ttsQueue li { background: #eee; padding: 8px; margin-top: 5px; border-radius: 4px; }
-        .info { color: #666; font-style: italic; margin-top: 1rem; }
+        :root {
+            --bg-color: #f0f2f5;
+            --container-bg: #ffffff;
+            --text-color: #1c1e21;
+            --text-interim-color: #8a8d91;
+            --border-color: #dce1e6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --blue: #007bff;
+            --red: #dc3545;
+            --green: #28a745;
+            --yellow: #ffc107;
+            --bg-listening: #e7f3ff;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .main-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .card {
+            background-color: var(--container-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        button {
+            border: none;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        #recordButton { background-color: var(--blue); color: white; }
+        #recordButton.recording { background-color: var(--red); }
+        #toggleQueueButton { background-color: var(--green); color: white; }
+        #toggleQueueButton.paused { background-color: var(--yellow); color: #333; }
+        #panicButton { background-color: var(--red); color: white; display: none; } /* Hide by default */
+
+        .transcript-wrapper {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+            transition: background-color 0.3s;
+        }
+        .transcript-wrapper.listening {
+            background-color: var(--bg-listening);
+            border-color: var(--blue);
+        }
+        .transcript-wrapper p {
+            margin: 0 0 10px 0;
+            padding: 0;
+            line-height: 1.5;
+            color: var(--text-color);
+        }
+        .transcript-wrapper .interim-text {
+            color: var(--text-interim-color);
+        }
+        .queue-wrapper {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        #ttsQueue {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        #ttsQueue li {
+            background: #f7f7f7;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            border-left: 4px solid var(--blue);
+            transition: all 0.3s ease;
+        }
+        #ttsQueue li.playing {
+            background-color: var(--bg-listening);
+            font-weight: bold;
+        }
+        #ttsQueue li .text-content {
+            font-size: 1.1em;
+        }
+        #ttsQueue li .file-name {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 4px;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Spracherkennung</h1>
-        <p>Klicken Sie auf "Aufnahme starten" und sprechen Sie. Der erkannte Text wird an den TTS-Server gesendet.</p>
-        <p class="info" id="audioInfo">Klicken Sie auf "Aufnahme starten", um die Audio-Wiedergabe zu aktivieren.</p>
-        <button id="startButton">Aufnahme starten</button>
-        <button id="stopButton">Aufnahme stoppen</button>
-        <div id="gesprochenerText" placeholder="Erkannter Text wird hier angezeigt..."></div>
-    </div>
 
-    <div class="container">
-        <h2>TTS-Warteschlange</h2>
-        <ul id="ttsQueue"></ul>
+    <div class="main-container">
+        <div class="card">
+            <h2>Steuerung</h2>
+            <div class="controls-grid">
+                <button id="recordButton">🎤 Aufnahme starten</button>
+                <button id="toggleQueueButton">⏸️ Warteschlange anhalten</button>
+                <button id="panicButton">⏹️ Aktuelle Wiedergabe stoppen</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Gesprochener Text</h2>
+            <div id="transcript-wrapper" class="transcript-wrapper">
+                </div>
+        </div>
+        
+        <div class="card">
+            <h2>TTS-Warteschlange</h2>
+            <div class="queue-wrapper">
+                <ul id="ttsQueue"></ul>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
