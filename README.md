@@ -1,181 +1,134 @@
-# Echtzeit-Anwendung für Spracherkennung und TTS
+# Speech-To-Speech Web-Anwendung für Echtzeit Spracherkennung und TTS
 
-Eine Webanwendung zur Echtzeit-Transkription und Text-to-Speech-Wandlung von gesprochener Sprache.
+Eine Web-Anwendung zur Echtzeit-Transkription von Spracheingaben mit direkter Text-to-Speech-Wandlung.
 
-## Quick Start mit Docker (Empfohlen)
+---
 
-Der einfachste und schnellste Weg, die gesamte Anwendung zu starten, ohne Node.js oder Python lokal installieren zu müssen.
+![Anwendungs-Demo GIF](STTTS_sm.gif)
 
-### Voraussetzungen
-- [Docker](https://www.docker.com/products/docker-desktop/) muss installiert sein und laufen.
+---
 
-### Anleitung
-1.  **Code herunterladen:**
-    Laden Sie alle Projektdateien (`Dockerfile`, `start.sh`, `requirements.txt`, etc.) in einen Ordner herunter.
+### ✨ Features
 
-2.  **Docker Image bauen:**
-    Öffnen Sie ein Terminal im Projektordner und führen Sie aus:
+- 🎤 **Echtzeit-Transkription:** Sprache wird live im Browser in Text umgewandelt.
+- 🎨 **Dynamische Texthistorie:** Finaler Text wird angezeigt, während vorläufiger Text farblich hervorgehoben wird.
+- 🔊 **Text-to-Speech (TTS):** Ein Python-Backend generiert aus dem erkannten Text Sprache.
+- 🎧 **Intelligente Audio-Warteschlange:** Generierte Audiodateien werden nacheinander abgespielt und danach automatisch gelöscht.
+- ⚙️ **Erweiterte Steuerung:** Pausieren, Fortsetzen und sofortiges Stoppen der Wiedergabe.
+- 🌐 **Flexible Anpassung:** Wiedergabegeschwindigkeit und TTS-Sprache sind einstellbar.
+- ✍️ **Smarte Interpunktion:** Erkennt Sprachbefehle wie "Punkt" oder "Fragezeichen".
+
+### 🛠️ Tech-Stack
+
+- **Frontend:** HTML5, CSS3, JavaScript (Web Speech API)
+- **Web-Server:** Node.js / Express
+- **TTS-Server:** Python / Flask / gTTS
+- **Deployment:** Docker
+
+---
+
+## 🚀 Quick Start (Empfohlen)
+
+Der einfachste Weg, die Anwendung zu starten. Docker muss installiert sein und laufen.
+
+1.  **Skript ausführbar machen (einmalig)**
     ```bash
-    docker build -t speech-app .
+    chmod +x rebuild_and_run.sh
     ```
 
-3.  **Docker Container starten:**
+2.  **Skript ausführen**
     ```bash
-    docker run -p 8080:8080 -p 5000:5000 --name speech-app-container speech-app
+    ./rebuild_and_run.sh
     ```
 
-4.  **Anwendung öffnen:**
-    Öffnen Sie Ihren Browser und gehen Sie zu **`http://localhost:8080`**.
+3.  **Anwendung öffnen**
+    Öffne deinen Browser und gehe zu **`http://localhost:8080`**. Fertig!
 
-### Container verwalten
+---
+
+## 👨‍💻 Informationen für Entwickler
+
+Die folgenden Abschnitte sind für die manuelle Installation und Entwicklung gedacht.
+
+### Manuelle Installation & Start
+
+**Voraussetzungen**
+- **Node.js** (v18.x oder neuer)
+- **Python** (v3.8 oder neuer)
+
+**1. Python Backend einrichten**
 ```bash
-# Live-Logs beider Server anzeigen
+cd backend_python
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+cd ..
+```
+
+**2. Node.js Frontend einrichten**
+```bash
+cd backend_node
+npm install
+cd ..
+```
+
+**3. Anwendung starten (zwei Terminals benötigt)**
+
+* **Terminal 1: Python TTS-Server**
+    ```bash
+    cd backend_python
+    source venv/bin/activate
+    waitress-serve --host 127.0.0.1 --port=5000 tts_server:app
+    ```
+* **Terminal 2: Node.js Web-Server**
+    ```bash
+    cd backend_node
+    node server.js
+    ```
+
+Öffne anschließend **`http://localhost:8080`** im Browser.
+
+### Docker Container verwalten
+
+```bash
 docker logs -f speech-app-container
-
-# Container stoppen
 docker stop speech-app-container
-
-# Container entfernen
 docker rm speech-app-container
 ```
 
----
-
-## Manuelle Installation (Für die Entwicklung)
-
-Folgen Sie diesen Schritten, wenn Sie die Anwendung ohne Docker direkt auf Ihrem System ausführen und entwickeln möchten.
-
-### Voraussetzungen
-- **Node.js** (v18.x oder neuer) und npm
-- **Python** (v3.8 oder neuer) und pip
-
-### 1. Python Backend einrichten
-```bash
-# In den Python-Ordner wechseln
-cd backend_python
-
-# Virtuelle Umgebung erstellen und aktivieren
-python3 -m venv venv
-source venv/bin/activate
-
-# Python-Abhängigkeiten installieren
-pip install -r requirements.txt
-
-# Zurück in den Hauptordner
-cd ..
-```
-
-### 2. Node.js Frontend einrichten
-```bash
-# In den Node-Ordner wechseln
-cd backend_node
-
-# Node.js-Abhängigkeiten installieren
-npm install
-
-# Zurück in den Hauptordner
-cd ..
-```
-
-### 3. Anwendung starten
-Sie benötigen zwei geöffnete Terminals im Projekt-Hauptverzeichnis.
-
-**Terminal 1: Python TTS-Server**
-```bash
-# In den Python-Ordner wechseln und Umgebung aktivieren
-cd backend_python
-source venv/bin/activate
-
-# Server starten
-waitress-serve --host 127.0.0.1 --port=5000 tts_server:app
-```
-
-**Terminal 2: Node.js Web-Server**
-```bash
-# In den Node-Ordner wechseln und Server starten
-cd backend_node
-node server.js
-```
-
-### 4. Anwendung öffnen
-Öffnen Sie Ihren Browser und gehen Sie zu **`http://localhost:8080`**.
-
----
-
-## Features
-
-- **Echtzeit-Spracherkennung:** Transkribiert gesprochene Sprache direkt im Browser.
-- **Dynamische Texthistorie:** Zeigt eine Historie der final erkannten Textsegmente an und hebt vorläufigen Text farblich hervor.
-- **Text-to-Speech (TTS):** Ein separater Python-Server generiert aus dem erkannten Text Audiodateien.
-- **Intelligente Warteschlange:** Alle erstellten Audiodateien werden verwaltet, nacheinander abgespielt und anschließend automatisch gelöscht.
-- **Erweiterte Steuerung:**
-    - Pausieren und Fortsetzen der Wiedergabe-Warteschlange.
-    - "Panik"-Knopf zum sofortigen Stoppen der aktuellen Wiedergabe.
-    - Visuelles Feedback über den Aufnahme- und Wiedergabestatus.
-- **Flexible Anpassung:**
-    - Einstellbare Wiedergabegeschwindigkeit.
-    - Auswahl der TTS-Sprache und des regionalen Akzents.
-- **Smarte Interpunktion:** Sprachbefehle wie "Punkt", "Ausrufezeichen" oder "Fragezeichen" werden automatisch in Satzzeichen umgewandelt.
-
 ### Anwendung nach Code-Änderungen aktualisieren
 
-Wenn Sie Änderungen am Quellcode vorgenommen haben (z.B. in \`app.js\` oder \`index.html\`), müssen Sie das Docker-Image neu bauen und den Container neu starten, damit Ihre Änderungen wirksam werden. Das mitgelieferte Skript \`rebuild_and_run.sh\` automatisiert diesen gesamten Prozess.
+Wenn du Docker nutzt und Änderungen am Code vorgenommen hast, nutze das `rebuild_and_run.sh` Skript.
 
-**Anleitung:**
-
-1.  **Änderungen speichern:** Stellen Sie sicher, dass alle Ihre Code-Änderungen gespeichert sind.
-
-2.  **Skript ausführbar machen (einmalig):**
-    Falls Sie dies noch nicht getan haben, machen Sie das Skript einmalig ausführbar:
-    \`\`\`bash
+1.  **Skript ausführbar machen (einmalig)**
+    ```bash
     chmod +x rebuild_and_run.sh
-    \`\`\`
+    ```
 
-3.  **Skript ausführen:**
-    Führen Sie das Skript aus, um alles automatisch neu zu bauen und zu starten:
-    \`\`\`bash
+2.  **Skript ausführen**
+    ```bash
     ./rebuild_and_run.sh
-    \`\`\`
+    ```
 
-**Beispiel-Ausgabe:**
+---
 
-Das Skript stoppt und entfernt den alten Container, baut das Image mit Ihren neuen Änderungen und startet einen frischen Container. Die Ausgabe im Terminal wird etwa so aussehen:
-
-\`\`\`bash
-./rebuild_and_run.sh
-➡️ Stoppe und entferne alten Container (falls vorhanden)...
-speech-app-container
-speech-app-container
-➡️ Baue neues Image 'speech-app'...
-[+] Building 1.3s (16/16) FINISHED
- => [internal] load build definition from Dockerfile
-... (detaillierte Build-Schritte werden hier angezeigt) ...
- => => naming to docker.io/library/speech-app
-🚀 Starte neuen Container 'speech-app-container'...
-81d85e067d7dc47dc5b7769b85dbf95e83ac0b302a811c1944d0cef3ca0c83bc
-✅ Fertig! Die Anwendung läuft.
-👀 Logs ansehen mit: docker logs -f speech-app-container
-\`\`\`
-
-Nachdem das Skript erfolgreich durchgelaufen ist, ist Ihre Anwendung mit den neuesten Änderungen sofort wieder unter **\`http://localhost:8080\`** erreichbar.
-
-## Projektstruktur
+### 📂 Projektstruktur
 ```text
 speech-tts-app/
 ├── backend_node/
-│   ├── public/
-│   │   ├── index.html
-│   │   └── app.js
-│   ├── server.js
-│   └── package.json
-│
+│   ├── public/         # Frontend (HTML, JS, CSS)
+│   └── server.js       # Node.js Webserver
 ├── backend_python/
-│   ├── tts_server.py
-│   └── requirements.txt
-│
-├── tts_audio/        # Speicherort für generierte MP3s (wird erstellt)
-├── Dockerfile
-├── start.sh
-├── rebuild_and_run.sh
+│   └── tts_server.py   # Python TTS-Server
+├── tts_audio/          # Temporärer Speicher für MP3s
+├── Dockerfile          # Bauanleitung für Docker
+├── start.sh            # Start-Skript für den Container
 └── README.md
 ```
+
+---
+
+### 📄 Lizenz
+
+Dieses Projekt steht unter der MIT-Lizenz.
+
+Made with AI.
