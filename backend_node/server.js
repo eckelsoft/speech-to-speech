@@ -9,8 +9,9 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const publicPath = __dirname;
-const ttsAudioPath = path.join(publicPath, 'tts_audio');
+const publicPath = path.join(__dirname, 'public');
+// Der Audio-Ordner liegt eine Ebene über dem Skript-Verzeichnis
+const ttsAudioPath = path.join(__dirname, '..', 'tts_audio');
 
 if (!fs.existsSync(ttsAudioPath)) {
     fs.mkdirSync(ttsAudioPath);

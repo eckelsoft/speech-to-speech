@@ -43,7 +43,7 @@ docker rm speech-app-container
 
 ## Manuelle Installation (Für die Entwicklung)
 
-Folgen Sie diesen Schritten, wenn Sie die Anwendung ohne Docker direkt auf Ihrem System ausführen und entwickeln möchten. (Empfohlene Umgebung: Ubuntu via WSL2)
+Folgen Sie diesen Schritten, wenn Sie die Anwendung ohne Docker direkt auf Ihrem System ausführen und entwickeln möchten.
 
 ### Voraussetzungen
 - **Node.js** (v18.x oder neuer) und npm
@@ -51,8 +51,8 @@ Folgen Sie diesen Schritten, wenn Sie die Anwendung ohne Docker direkt auf Ihrem
 
 ### 1. Python Backend einrichten
 ```bash
-# In den Projektordner wechseln
-cd speech-tts-app
+# In den Python-Ordner wechseln
+cd backend_python
 
 # Virtuelle Umgebung erstellen und aktivieren
 python3 -m venv venv
@@ -60,20 +60,30 @@ source venv/bin/activate
 
 # Python-Abhängigkeiten installieren
 pip install -r requirements.txt
+
+# Zurück in den Hauptordner
+cd ..
 ```
 
 ### 2. Node.js Frontend einrichten
 ```bash
-# Node.js-Abhängigkeiten im Projektordner installieren
-npm install express ws chokidar
+# In den Node-Ordner wechseln
+cd backend_node
+
+# Node.js-Abhängigkeiten installieren
+npm install
+
+# Zurück in den Hauptordner
+cd ..
 ```
 
 ### 3. Anwendung starten
-Sie benötigen zwei geöffnete Terminals im Projektverzeichnis.
+Sie benötigen zwei geöffnete Terminals im Projekt-Hauptverzeichnis.
 
 **Terminal 1: Python TTS-Server**
 ```bash
-# Virtuelle Umgebung aktivieren
+# In den Python-Ordner wechseln und Umgebung aktivieren
+cd backend_python
 source venv/bin/activate
 
 # Server starten
@@ -82,7 +92,8 @@ waitress-serve --host 127.0.0.1 --port=5000 tts_server:app
 
 **Terminal 2: Node.js Web-Server**
 ```bash
-# Server starten
+# In den Node-Ordner wechseln und Server starten
+cd backend_node
 node server.js
 ```
 
@@ -151,13 +162,20 @@ Nachdem das Skript erfolgreich durchgelaufen ist, ist Ihre Anwendung mit den neu
 ## Projektstruktur
 ```text
 speech-tts-app/
-├── tts_audio/        # Speicherort für generierte MP3s
-├── Dockerfile        # Bauanleitung für den Docker-Container
-├── start.sh          # Start-Skript für den Docker-Container
-├── index.html        # Frontend-Struktur
-├── app.js            # Frontend-Logik
-├── server.js         # Node.js Backend-Server
-├── tts_server.py     # Python TTS-Server
-├── package.json      # Node.js-Abhängigkeiten
-└── requirements.txt  # Python-Abhängigkeiten
+├── backend_node/
+│   ├── public/
+│   │   ├── index.html
+│   │   └── app.js
+│   ├── server.js
+│   └── package.json
+│
+├── backend_python/
+│   ├── tts_server.py
+│   └── requirements.txt
+│
+├── tts_audio/        # Speicherort für generierte MP3s (wird erstellt)
+├── Dockerfile
+├── start.sh
+├── rebuild_and_run.sh
+└── README.md
 ```

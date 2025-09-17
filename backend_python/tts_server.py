@@ -7,7 +7,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-TTS_FOLDER = "tts_audio"
+# Der Audio-Ordner liegt eine Ebene über dem Skript-Verzeichnis
+TTS_FOLDER = os.path.join(os.path.dirname(__file__), '..', 'tts_audio')
 if not os.path.exists(TTS_FOLDER):
     os.makedirs(TTS_FOLDER)
 
