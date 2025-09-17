@@ -18,14 +18,17 @@ def erzeuge_tts():
         if not data or 'text' not in data or not data['text'].strip():
             return jsonify({"status": "fehler", "message": "Leerer Text empfangen."}), 400
         
-        text = data['text']
+        text = data.get('text')
+        lang = data.get('lang', 'de')
+        tld = data.get('tld', 'de')
+        
         dateiname = f"{int(time.time() * 1000)}.mp3"
         dateipfad = os.path.join(TTS_FOLDER, dateiname)
 
-        tts = gTTS(text=text, lang='de')
+        tts = gTTS(text=text, lang=lang, tld=tld, slow=False)
         tts.save(dateipfad)
         
-        print(f"TTS-Datei erstellt: {dateiname} für Text: '{text}'")
+        print(f"TTS-Datei erstellt: {dateiname} (lang={lang}, tld={tld}) für Text: '{text}'")
         return jsonify({"status": "erfolgreich", "dateiname": dateiname})
     except Exception as e:
         print(f"Fehler bei der TTS-Erstellung: {e}")
