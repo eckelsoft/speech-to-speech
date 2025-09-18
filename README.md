@@ -1,10 +1,16 @@
 # Speech-To-Speech Web-Anwendung für Echtzeit Spracherkennung und TTS
 
 Eine Web-Anwendung zur Echtzeit-Transkription von Spracheingaben mit direkter Text-to-Speech-Wandlung.
+- Starte docker mit `./rebuild_and_run.sh`
+- Anwendung benutzen auf `http://localhost:8080`
 
 ---
 
 ![Anwendungs-Demo GIF](STTTS_sm.gif)
+
+---
+
+![Starte-Anwendung GIF](STTTS_console_sm.gif)
 
 ---
 
