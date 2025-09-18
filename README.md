@@ -15,7 +15,7 @@ Eine Web-Anwendung zur Echtzeit-Transkription von Spracheingaben mit direkter Te
 - 🔊 **Text-to-Speech (TTS):** Ein Python-Backend generiert aus dem erkannten Text Sprache.
 - 🎧 **Intelligente Audio-Warteschlange:** Generierte Audiodateien werden nacheinander abgespielt und danach automatisch gelöscht.
 - ⚙️ **Erweiterte Steuerung:** Pausieren, Fortsetzen und sofortiges Stoppen der Wiedergabe.
-- 🌐 **Flexible Anpassung:** Wiedergabegeschwindigkeit und TTS-Sprache sind einstellbar.
+- 🌐 **Flexible Anpassung:** Wiedergabegeschwindigkeit und Pausenerkennung sind einstellbar.
 - ✍️ **Smarte Interpunktion:** Erkennt Sprachbefehle wie "Punkt" oder "Fragezeichen".
 
 ### 🛠️ Tech-Stack
